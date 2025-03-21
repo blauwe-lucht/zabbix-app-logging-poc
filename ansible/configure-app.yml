@@ -1,0 +1,36 @@
+---
+- name: Configure application server
+  hosts: app
+  become: true
+  tasks:
+    - name: Create application directory
+      ansible.builtin.file:
+        path: /opt/app
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Copy application script
+      ansible.builtin.copy:
+        src: app/opt/app/app.sh
+        dest: /opt/app/app.sh
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Create log directory
+      ansible.builtin.file:
+        path: /var/log/app
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Create log file
+      ansible.builtin.file:
+        path: /var/log/app/app.log
+        state: touch
+        mode: "0666"
+        owner: root
+        group: root

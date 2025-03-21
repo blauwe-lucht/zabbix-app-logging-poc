@@ -1,25 +1,20 @@
 {
     "terminal.integrated.profiles.linux": {
-        "acs (vagrant ssh)": {
+        // These only work when connected over Remote SSH.
+        "acs": {
             "path": "bash",
-            "args": ["-c", "vagrant ssh acs"],
             "icon": "terminal-bash",
             "overrideName": true
         },
-        "app (vagrant ssh)": {
+        "app": {
             "path": "bash",
-            "args": ["-c", "vagrant ssh app"],
+            "args": ["-c", "ssh vagrant@192.168.3.20 -i /vagrant/.vagrant/machines/app/virtualbox/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"],
             "icon": "terminal-bash",
             "overrideName": true
         },
-        "zabbix (vagrant ssh)": {
+        "zabbix": {
             "path": "bash",
-            "args": ["-c", "vagrant ssh zabbix"],
-            "icon": "terminal-bash",
-            "overrideName": true
-        },
-        "acs (connected via RemoteSSH)": {
-            "path": "bash",
+            "args": ["-c", "ssh vagrant@192.168.3.21 -i /vagrant/.vagrant/machines/zabbix/virtualbox/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"],
             "icon": "terminal-bash",
             "overrideName": true
         },
@@ -29,36 +24,6 @@
         "JavaScript Debug Terminal": null,
         "tmux": null,
         "pwsh": null
-    },
-    "terminal.integrated.profiles.windows": {
-        "acs (vagrant ssh)": {
-            "path": "powershell",
-            "args": ["-NoLogo", "-Command", "vagrant ssh acs"],
-            "icon": "terminal-powershell",
-            "overrideName": true
-        },
-        "app (vagrant ssh)": {
-            "path": "powershell",
-            "args": ["-NoLogo", "-Command", "vagrant ssh app"],
-            "icon": "terminal-powershell",
-            "overrideName": true
-        },
-        "zabbix (vagrant ssh)": {
-            "path": "powershell",
-            "args": ["-NoLogo", "-Command", "vagrant ssh zabbix"],
-            "icon": "terminal-powershell",
-            "overrideName": true
-        },
-        "acs (connected via RemoteSSH)": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "overrideName": true
-        },
-        // Remove unneeded terminals:
-        "Azure Cloud Shell (Bash)": null,
-        "Azure Cloud Shell (PowerShell)": null,
-        "JavaScript Debug Terminal": null,
-        "tmux": null
     },
 
     // Make sure the Ansible extension is using ansible-lint from the virtual env:

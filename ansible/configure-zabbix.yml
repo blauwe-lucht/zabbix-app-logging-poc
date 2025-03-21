@@ -1,0 +1,8 @@
+---
+- name: Configure Zabbix server
+  hosts: zabbix
+  become: true
+  tasks:
+    # Note: Zabbix is already installed in the Vagrant box, we only have to add configuration to start monitoring.
+    - name: Ping
+      ansible.builtin.ping:

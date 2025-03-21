@@ -1,0 +1,7 @@
+---
+ansible_host: "192.168.3.21"
+ansible_ssh_private_key_file: /vagrant/.vagrant/machines/zabbix/virtualbox/private_key
+ansible_python_interpreter: /usr/bin/python
+zabbix_url: "http://{{ ansible_host }}"
+zabbix_api_user: "Admin"
+zabbix_api_password: "zabbix"

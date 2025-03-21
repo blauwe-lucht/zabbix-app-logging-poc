@@ -37,7 +37,10 @@ Vagrant.configure("2") do |config|
                     pip install ansible ansible-lint pywinrm
 
                     # Make sure we always use ansible from the virtualenv.
-                    echo ". ~/venv-ansible/bin/activate" >> ~/.bashrc
+                    # The if is needed to prevent multiple venv names in the prompt.
+                    echo "if [[ -z \"\\$VIRTUAL_ENV\" ]]; then" >> ~/.bashrc
+                    echo "    . ~/venv-ansible/bin/activate" >> ~/.bashrc
+                    echo "fi" >> ~/.bashrc
                 '
             SHELL
         end
@@ -53,7 +56,6 @@ Vagrant.configure("2") do |config|
         app.vm.box = "almalinux/9"
         app.vm.hostname = "app"
         app.vm.network "private_network", ip: "192.168.3.20"
-        app.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2320
 
         # The rest of the server will be configured using Ansible.
     end
@@ -63,7 +65,6 @@ Vagrant.configure("2") do |config|
         zabbix.vm.box = "blauwelucht/zabbix-server"
         zabbix.vm.hostname = "zabbix"
         zabbix.vm.network "private_network", ip: "192.168.3.21"
-        zabbix.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2321
 
         # The rest of the server will be configured using Ansible.
     end
