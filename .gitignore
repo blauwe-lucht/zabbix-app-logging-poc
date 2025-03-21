@@ -1,2 +1,5 @@
 # Local Vagrant administration:
 /.vagrant
+
+# All log files:
+*.log
