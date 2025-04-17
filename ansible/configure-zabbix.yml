@@ -1,8 +1,36 @@
 ---
 - name: Configure Zabbix server
   hosts: zabbix
-  become: true
+  gather_facts: false
+  vars:
+    monitored_host: "192.168.3.20"
+    zabbix_host_group: "Linux servers"
+    zabbix_template: "Linux by Zabbix agent"
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_zabbix_url_path: ''
+    ansible_user: "{{ zabbix_api_user }}"
+    ansible_password: "{{ zabbix_api_password }}"
   tasks:
     # Note: Zabbix is already installed in the Vagrant box, we only have to add configuration to start monitoring.
-    - name: Ping
-      ansible.builtin.ping:
+
+    - name: Create host in Zabbix
+      community.zabbix.zabbix_host:
+        http_login_user: "{{ zabbix_api_user }}"
+        http_login_password: "{{ zabbix_api_password }}"
+        host_name: app
+        visible_name: app
+        description: Application server
+        host_groups:
+          - "{{ zabbix_host_group }}"
+        link_templates:
+          - "{{ zabbix_template }}"
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: "{{ monitored_host }}"
+            dns: ""
+            port: 10050
+        status: enabled

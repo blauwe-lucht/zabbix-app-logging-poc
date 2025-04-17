@@ -38,6 +38,7 @@ the directory /vagrant on the acs. Trust the directory. Install the recommended 
     ```
 
 6. Wait for a bit and if everything went fine, app and zabbix will be configured.
+The Zabbix web UI can be accessed at http://192.168.3.21, user Admin, password zabbix.
 
 ## Clean up
 

@@ -34,3 +34,38 @@
         mode: "0666"
         owner: root
         group: root
+
+    - name: Ensure Zabbix repo is installed
+      ansible.builtin.dnf:
+        name: https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/zabbix-release-latest-7.0.el9.noarch.rpm
+        state: present
+      register: yum_result
+
+    - name: Update yum metadata
+      ansible.builtin.dnf: # noqa: no-handler
+        update_cache: true
+      when: yum_result.changed
+
+    - name: Install zabbix-agent2
+      ansible.builtin.dnf:
+        name: zabbix-agent2
+        state: present
+
+    - name: Ensure zabbix-agent2 is running and enabled
+      ansible.builtin.systemd:
+        name: zabbix-agent2
+        state: started
+        enabled: true
+
+    - name: Configure zabbix-agent2
+      ansible.builtin.lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "Server=127\\.0\\.0\\.1"
+        line: "Server=192.168.3.21"
+      register: zabbix_agent_config_result
+
+    - name: Restart zabbix-agent2
+      ansible.builtin.systemd: # noqa: no-handler
+        name: zabbix-agent2
+        state: restarted
+      when: zabbix_agent_config_result.changed

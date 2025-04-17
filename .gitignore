@@ -3,3 +3,6 @@
 
 # All log files:
 *.log
+
+# .lock files:
+*.lock

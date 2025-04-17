@@ -26,12 +26,19 @@ Vagrant.configure("2") do |config|
             shell.inline = <<-SHELL
                 set -euxo pipefail
 
+                # To be able to correctly use the Zabbix server API, we need to use a recent version
+                # of the community.zabbix collection (>= 3.0.0). This requires a newer version of Ansible than 2.15.
+                # However the latest version of Ansible requires a newer version of Python.
+                # AlmaLinux 9 ships with Python 3.9, Ansible 2.18 requires Python 3.11.
+                dnf install -y python3.11 python3.11-pip
+
                 # Pip prefers to run in a virtual environment, so we create one for the vagrant user
                 # and use pip from that venv to install ansible and ansible-lint.
                 sudo -u vagrant bash -c '
                     set -euxo pipefail
 
-                    python -m venv /home/vagrant/venv-ansible
+
+                    python3.11 -m venv /home/vagrant/venv-ansible
                     . /home/vagrant/venv-ansible/bin/activate
                     pip install --upgrade pip
                     pip install ansible ansible-lint pywinrm
@@ -65,6 +72,13 @@ Vagrant.configure("2") do |config|
         zabbix.vm.box = "blauwelucht/zabbix-server"
         zabbix.vm.hostname = "zabbix"
         zabbix.vm.network "private_network", ip: "192.168.3.21"
+
+        # Ansible needs Python before it can do anything, so install it.
+        zabbix.vm.provision "shell" do |shell|
+            shell.inline = <<-SHELL
+                yum install -y python3.12
+            SHELL
+        end
 
         # The rest of the server will be configured using Ansible.
     end
