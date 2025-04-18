@@ -3,7 +3,8 @@
   hosts: zabbix
   gather_facts: false
   vars:
-    monitored_host: "192.168.3.20"
+    monitored_host_ip: "192.168.3.20"
+    monitored_host_name: "app"
     zabbix_host_group: "Linux servers"
     zabbix_template: "Linux by Zabbix agent"
     ansible_network_os: community.zabbix.zabbix
@@ -19,8 +20,8 @@
       community.zabbix.zabbix_host:
         http_login_user: "{{ zabbix_api_user }}"
         http_login_password: "{{ zabbix_api_password }}"
-        host_name: app
-        visible_name: app
+        host_name: "{{ monitored_host_name }}"
+        visible_name: "{{ monitored_host_name }}"
         description: Application server
         host_groups:
           - "{{ zabbix_host_group }}"
@@ -30,7 +31,40 @@
           - type: 1
             main: 1
             useip: 1
-            ip: "{{ monitored_host }}"
+            ip: "{{ monitored_host_ip }}"
             dns: ""
             port: 10050
         status: enabled
+
+    - name: Create log monitoring item in Zabbix
+      community.zabbix.zabbix_item:
+        http_login_user: "{{ zabbix_api_user }}"
+        http_login_password: "{{ zabbix_api_password }}"
+        host_name: "{{ monitored_host_name }}"
+        name: "App startup log monitor"
+        params:
+          # zabbix_agent is not implemented in 2.18 so we use zabbix_agent_active instead.
+          type: zabbix_agent_active
+          key: 'log[/var/log/app/app.log,"App successfully started|Error starting app",,,skip]'
+          value_type: log
+          interval: 5s
+        state: present
+
+    - name: Create dependent item to track last app startup status
+      community.zabbix.zabbix_item:
+        http_login_user: "{{ zabbix_api_user }}"
+        http_login_password: "{{ zabbix_api_password }}"
+        host_name: "{{ monitored_host_name }}"
+        name: "App startup last status"
+        params:
+          type: dependent_item
+          key: "app.status"
+          master_item:
+            item_name: "App startup log monitor"
+          value_type: character
+          preprocessing:
+            - type: regular_expressions
+              params: |-
+                .*(successfully|Error).*
+                \1
+              error_handler: zabbix_server
