@@ -66,8 +66,15 @@
         line: "Server=192.168.3.21"
       register: zabbix_agent_config_result
 
+    - name: Configure zabbix-agent2
+      ansible.builtin.lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        insertafter: "Server=192.168.3.21"
+        line: "ServerActive=192.168.3.21"
+      register: zabbix_agent_active_config_result
+
     - name: Restart zabbix-agent2
       ansible.builtin.systemd: # noqa: no-handler
         name: zabbix-agent2
         state: restarted
-      when: zabbix_agent_config_result.changed
+      when: zabbix_agent_config_result.changed or zabbix_agent_active_config_result.changed
