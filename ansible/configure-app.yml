@@ -26,25 +26,27 @@
         mode: "0755"
         owner: root
         group: root
+      register: log_dir_result
 
     - name: Create log file
-      ansible.builtin.file:
+      ansible.builtin.file: # noqa: no-handler
         path: /var/log/app/app.log
         state: touch
         mode: "0666"
         owner: root
         group: root
+      when: log_dir_result.changed
 
     - name: Ensure Zabbix repo is installed
       ansible.builtin.dnf:
         name: https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/zabbix-release-latest-7.0.el9.noarch.rpm
         state: present
-      register: yum_result
+      register: dnf_result
 
-    - name: Update yum metadata
+    - name: Update dnf metadata
       ansible.builtin.dnf: # noqa: no-handler
         update_cache: true
-      when: yum_result.changed
+      when: dnf_result.changed
 
     - name: Install zabbix-agent2
       ansible.builtin.dnf:
