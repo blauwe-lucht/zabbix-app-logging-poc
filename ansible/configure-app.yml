@@ -2,6 +2,7 @@
 - name: Configure application server
   hosts: app
   become: true
+  gather_facts: false
   tasks:
     - name: Create application directory
       ansible.builtin.file:
@@ -37,6 +38,25 @@
         group: root
       when: log_dir_result.changed
 
+    # The zabbbix repo uses SHA1, which is not allowed by default in AlmaLinux 9.2.
+    # We need to set the crypto policy to DEFAULT:SHA1 to allow the installation of the Zabbix repo.
+    # This is a temporary workaround until the Zabbix repo is updated to use SHA256 or higher.
+    - name: Check current crypto policy
+      ansible.builtin.command: update-crypto-policies --show
+      register: current_crypto_policy_result
+      changed_when: false
+
+    - name: Set crypto policy to DEFAULT:SHA1 if needed
+      ansible.builtin.command: update-crypto-policies --set DEFAULT:SHA1
+      when: current_crypto_policy_result.stdout != "DEFAULT:SHA1"
+      register: crypto_policy_result
+      changed_when: true
+
+    - name: Import Zabbix GPG key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://repo.zabbix.com/zabbix-official-repo.key
+
     - name: Ensure Zabbix repo is installed
       ansible.builtin.dnf:
         name: https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/zabbix-release-latest-7.0.el9.noarch.rpm
@@ -59,22 +79,29 @@
         state: started
         enabled: true
 
-    - name: Configure zabbix-agent2
+    - name: Configure zabbix-agent2 Server
       ansible.builtin.lineinfile:
         path: /etc/zabbix/zabbix_agent2.conf
-        regexp: "Server=127\\.0\\.0\\.1"
+        regexp: "^Server=127\\.0\\.0\\.1"
         line: "Server=192.168.3.21"
       register: zabbix_agent_config_result
 
-    - name: Configure zabbix-agent2
+    - name: Configure zabbix-agent2 ServerActive
       ansible.builtin.lineinfile:
         path: /etc/zabbix/zabbix_agent2.conf
-        insertafter: "Server=192.168.3.21"
+        regexp: "^ServerActive=127\\.0\\.0\\.1"
         line: "ServerActive=192.168.3.21"
       register: zabbix_agent_active_config_result
+
+    - name: Configure zabbix-agent2 Hostname
+      ansible.builtin.lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^Hostname="
+        line: "Hostname=app"
+      register: zabbix_agent_hostname_config_result
 
     - name: Restart zabbix-agent2
       ansible.builtin.systemd: # noqa: no-handler
         name: zabbix-agent2
         state: restarted
-      when: zabbix_agent_config_result.changed or zabbix_agent_active_config_result.changed
+      when: zabbix_agent_config_result.changed or zabbix_agent_active_config_result.changed or zabbix_agent_hostname_config_result.changed
