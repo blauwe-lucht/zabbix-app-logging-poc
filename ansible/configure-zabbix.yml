@@ -43,7 +43,7 @@
         host_name: "{{ monitored_host_name }}"
         name: "App startup log monitor"
         params:
-          # zabbix_agent is not implemented in 2.18 so we use zabbix_agent_active instead.
+          # log requires zabbix_agent_active.
           type: zabbix_agent_active
           key: 'log[/var/log/app/app.log,"App successfully started|Error starting app",,,skip]'
           value_type: log
@@ -68,3 +68,16 @@
                 .*(successfully|Error).*
                 \1
               error_handler: zabbix_server
+
+    - name: Create trigger for app startup failure
+      community.zabbix.zabbix_trigger:
+        http_login_user: "{{ zabbix_api_user }}"
+        http_login_password: "{{ zabbix_api_password }}"
+        host_name: "{{ monitored_host_name }}"
+        name: "App startup failure"
+        description: "App last startup failed"
+        params:
+          severity: high
+          expression: 'last(/{{ monitored_host_name }}/app.status)="Error"'
+          status: enabled
+        state: present
