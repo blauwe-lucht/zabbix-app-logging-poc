@@ -16,8 +16,9 @@ This will create three VMs: acs (Linux machine with Ansible installed), app (ser
 3. In vscode: F1 -> Remote-SSH: Open SSH Configuration File, select the one in your user directory, add
 
     ``` ssh
-    Host acs
+    Host zabbix-app-logging-poc-acs
         HostName 192.168.3.19
+        Port 2319
         User vagrant
         IdentityFile <path to project>/.vagrant/machines/acs/virtualbox/private_key
         StrictHostKeyChecking no
@@ -25,7 +26,7 @@ This will create three VMs: acs (Linux machine with Ansible installed), app (ser
     ```
 
 4. In vscode left click the connection button in the bottom left (blue or green with something that
-looks like ><) or press F1 and select Remote-SSH: Connect to Host. Select host 'acs', select Linux.
+looks like ><) or press F1 and select Remote-SSH: Connect to Host. Select host 'zabbix-app-logging-poc-acs', select Linux.
 Vscode will now install everything that is needed to work with files on the acs. When it's ready, open
 the directory /vagrant on the acs. Trust the directory. Install the recommended extensions
 ([Ansible](https://marketplace.visualstudio.com/items?itemName=redhat.ansible) and
@@ -38,7 +39,8 @@ the directory /vagrant on the acs. Trust the directory. Install the recommended 
     ```
 
 6. Wait for a bit and if everything went fine, app and zabbix will be configured.
-The Zabbix web UI can be accessed at http://192.168.3.21, user Admin, password zabbix.
+The Zabbix web UI can be accessed at <http://192.168.3.21>, user Admin, password zabbix.
+7. Ssh into the app server either using ```vagrant ssh app``` or using the 'app' terminal when connected with Remote SSH, cd to /opt/app and run ```./app.sh fail```. Within a minute this will result in a problem on the Zabbix dashboard. To fix the error, run ```./app.sh```.
 
 ## Clean up
 
