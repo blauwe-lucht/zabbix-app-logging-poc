@@ -6,7 +6,6 @@
     monitored_host_ip: "192.168.3.20"
     monitored_host_name: "app"
     zabbix_host_group: "Linux servers"
-    zabbix_template: "Linux by Zabbix agent"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 80
@@ -26,7 +25,8 @@
         host_groups:
           - "{{ zabbix_host_group }}"
         link_templates:
-          - "{{ zabbix_template }}"
+          - Linux by Zabbix agent
+          - ICMP Ping
         interfaces:
           - type: 1
             main: 1
