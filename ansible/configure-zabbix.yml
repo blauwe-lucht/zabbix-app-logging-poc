@@ -36,6 +36,8 @@
             port: 10050
         status: enabled
 
+    # This collects data from the application log.
+    # It only collects the lines that specify success or failure.
     - name: Create log monitoring item in Zabbix
       community.zabbix.zabbix_item:
         http_login_user: "{{ zabbix_api_user }}"
@@ -50,6 +52,8 @@
           interval: 5s
         state: present
 
+    # This modifies the data collected by the log monitoring item to a simpler value ('successfully' or 'Error')
+    # that can be triggered on.
     - name: Create dependent item to track last app startup status
       community.zabbix.zabbix_item:
         http_login_user: "{{ zabbix_api_user }}"
@@ -69,6 +73,7 @@
                 \1
               error_handler: zabbix_server
 
+    # This creates the actual error state on a dashboard.
     - name: Create trigger for app startup failure
       community.zabbix.zabbix_trigger:
         http_login_user: "{{ zabbix_api_user }}"
