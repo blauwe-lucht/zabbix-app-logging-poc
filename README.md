@@ -35,7 +35,8 @@ the directory /vagrant on the acs. Trust the directory. Install the recommended 
 
     ``` bash
     cd /vagrant/ansible
-    ansible-playbook playbook.yml -v
+    ansible-playbook configure-zabbix.yml -v
+    ansible-playbook configure-app.yml -v
     ```
 
 6. Wait for a bit and if everything went fine, app and zabbix will be configured.
