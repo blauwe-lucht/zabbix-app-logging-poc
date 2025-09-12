@@ -3,7 +3,7 @@
   hosts: zabbix
   gather_facts: false
   vars:
-    monitored_host_ip: "192.168.3.20"
+    monitored_host_ip: "192.168.66.20"
     monitored_host_name: "app"
     zabbix_host_group: "Linux servers"
     ansible_network_os: community.zabbix.zabbix

@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
         # We're using a private network which will result in a 'host-only' adapter,
         # which will make the VM accessible directly from the host machine.
         # We specify the IP-address so we can easily refer to each machine in Ansible.
-        acs.vm.network "private_network", ip: "192.168.3.19"
+        acs.vm.network "private_network", ip: "192.168.66.19"
 
         # We're going to use Visual Studio Code Remote SSH to connect to the machines,
         # so we need a way to make the SSH ports predictable (they're not by default).
@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "app" do |app|
         app.vm.box = "almalinux/9"
         app.vm.hostname = "app"
-        app.vm.network "private_network", ip: "192.168.3.20"
+        app.vm.network "private_network", ip: "192.168.66.20"
 
         # The rest of the server will be configured using Ansible.
     end
@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "zabbix" do |zabbix|
         zabbix.vm.box = "blauwelucht/zabbix-server"
         zabbix.vm.hostname = "zabbix"
-        zabbix.vm.network "private_network", ip: "192.168.3.21"
+        zabbix.vm.network "private_network", ip: "192.168.66.21"
 
         # Ansible needs Python before it can do anything, so install it.
         zabbix.vm.provision "shell" do |shell|
