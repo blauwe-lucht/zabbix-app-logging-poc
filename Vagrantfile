@@ -19,7 +19,13 @@ Vagrant.configure("2") do |config|
         
         # Make sure all sensitive info is only readable by user (SSH requires this
         # when using private keys to connect to a VM).
-        acs.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=700,fmode=600"]
+        acs.vm.provider "virtualbox" do |vb, override|
+            override.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=700,fmode=600"]
+        end
+
+        acs.vm.provider "vmware_workstation" do |vmware, override|
+            override.vm.synced_folder ".", "/vagrant", mount_options: ["uid=1000,gid=1000"]
+        end
 
         # Do the initial setup of the ACS with a script.
         acs.vm.provision "shell" do |shell|
