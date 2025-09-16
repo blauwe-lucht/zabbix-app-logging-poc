@@ -5,22 +5,39 @@ Proof of concept that shows how to configure Zabbix so it can monitor if an appl
 ## Prerequisites
 
 - [Visual Studio Code](https://code.visualstudio.com/) (vscode)
-- [VirtualBox](https://www.virtualbox.org/), tested with version 7.0 (7.1 didn't work)
+- [VirtualBox](https://www.virtualbox.org/) OR [VMware Workstation](https://www.vmware.com/products/workstation-pro.html)
 - [Vagrant](https://www.vagrantup.com/), tested with version 2.4.3
 
 ## Usage
 
-1. ```vagrant up --provider vmware_workstation```
-This will create three VMs: acs (Linux machine with Ansible installed), app (server where the application is running) and zabbix (Zabbix server).
+1. Choose your provider and start the VMs:
+   - For VirtualBox: ```vagrant up --provider virtualbox```
+   - For VMware: ```vagrant up --provider vmware_workstation```
+
+   This will create three VMs: acs (Linux machine with Ansible installed), app (server where the application is running) and zabbix (Zabbix server).
 2. Install the [Remote SSH extension](https://code.visualstudio.com/docs/remote/ssh) in vscode
-3. In vscode: F1 -> Remote-SSH: Open SSH Configuration File, select the one in your user directory, add
+3. In vscode: F1 -> Remote-SSH: Open SSH Configuration File, select the one in your user directory, add:
+
+   For VirtualBox:
+
+    ``` ssh
+    Host zabbix-app-logging-poc-acs
+        HostName 192.168.23.19
+        Port 2219
+        User vagrant
+        IdentityFile <path to project>/.vagrant/machines/acs/virtualbox/private_key
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+    ```
+
+   For VMware:
 
     ``` ssh
     Host zabbix-app-logging-poc-acs
         HostName 192.168.66.19
         Port 2319
         User vagrant
-        IdentityFile <path to project>/.vagrant/machines/acs/virtualbox/private_key
+        IdentityFile <path to project>/.vagrant/machines/acs/vmware_workstation/private_key
         StrictHostKeyChecking no
         UserKnownHostsFile /dev/null
     ```
@@ -31,16 +48,30 @@ Vscode will now install everything that is needed to work with files on the acs.
 the directory /vagrant on the acs. Trust the directory. Install the recommended extensions
 ([Ansible](https://marketplace.visualstudio.com/items?itemName=redhat.ansible) and
 [Ansible Go to Definition](https://marketplace.visualstudio.com/items?itemName=BlauweLucht.ansible-go-to-definition)).
-5. In vscode open a terminal window and type:
+5. In vscode open a terminal window and run the appropriate commands for your provider:
+
+   For VirtualBox:
 
     ``` bash
     cd /vagrant/ansible
-    ansible-playbook configure-zabbix.yml -v
-    ansible-playbook configure-app.yml -v
+    ansible-playbook -i inventory-virtualbox.ini configure-zabbix.yml -v
+    ansible-playbook -i inventory-virtualbox.ini configure-app.yml -v
+    ```
+
+   For VMware:
+
+    ``` bash
+    cd /vagrant/ansible
+    ansible-playbook -i inventory-vmware.ini configure-zabbix.yml -v
+    ansible-playbook -i inventory-vmware.ini configure-app.yml -v
     ```
 
 6. Wait for a bit and if everything went fine, app and zabbix will be configured.
-The Zabbix web UI can be accessed at <http://192.168.66.21>, user Admin, password zabbix.
+   The Zabbix web UI can be accessed at:
+   - VirtualBox: <http://192.168.23.21>
+   - VMware: <http://192.168.66.21>
+
+   User: Admin, password: zabbix
 7. Ssh into the app server either using ```vagrant ssh app``` or using the 'app' terminal when connected with Remote SSH, cd to /opt/app and run ```./app.sh fail```. Within a minute this will result in a problem on the Zabbix dashboard. To fix the error, run ```./app.sh```.
 
 ## Clean up

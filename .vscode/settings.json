@@ -1,8 +1,12 @@
 {
     "terminal.integrated.profiles.linux": {
-        // These only work when connected over Remote SSH.
+        // These only work when working on the host.
         "acs": {
             "path": "bash",
+            "args": [
+                "-c",
+                "vagrant ssh acs"
+            ],
             "icon": "terminal-bash",
             "overrideName": true
         },
@@ -10,7 +14,7 @@
             "path": "bash",
             "args": [
                 "-c",
-                "ssh vagrant@192.168.66.20 -i /vagrant/.vagrant/machines/app/virtualbox/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+                "vagrant ssh app"
             ],
             "icon": "terminal-bash",
             "overrideName": true
@@ -19,7 +23,7 @@
             "path": "bash",
             "args": [
                 "-c",
-                "ssh vagrant@192.168.66.21 -i /vagrant/.vagrant/machines/zabbix/virtualbox/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+                "vagrant ssh zabbix"
             ],
             "icon": "terminal-bash",
             "overrideName": true
