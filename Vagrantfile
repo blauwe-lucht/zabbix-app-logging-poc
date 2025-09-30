@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
 
         acs.vm.provider "vmware_workstation" do |vmware, override|
             override.vm.network "private_network", ip: "192.168.66.19"
-            override.vm.synced_folder ".", "/vagrant", mount_options: ["uid=1000,gid=1000"]
+            override.vm.synced_folder ".", "/vagrant", mount_options: ["uid=1000,gid=1000,umask=0077"]
 
             # Default is 1 GB, that is too small for ansible-lint.
             vmware.memory = "2048"
